@@ -26,12 +26,10 @@ impl<H: Habitat, G: RngCore> DispersalSampler<H, G> for InMemoryCumulativeDisper
         let cumulative_dispersals_at_location = &self.cumulative_dispersal
             [location_index * habitat_area..(location_index + 1) * habitat_area];
 
-        let cumulative_percentage_sample = rng.sample_uniform().get();
+        let cumulative_percentage_sample = rng.sample_uniform();
 
         let dispersal_target_index = usize::min(
-            match cumulative_dispersals_at_location
-                .binary_search_by(|v| v.total_cmp(&cumulative_percentage_sample))
-            {
+            match cumulative_dispersals_at_location.binary_search(&cumulative_percentage_sample) {
                 Ok(index) | Err(index) => index,
             },
             habitat_area - 1,

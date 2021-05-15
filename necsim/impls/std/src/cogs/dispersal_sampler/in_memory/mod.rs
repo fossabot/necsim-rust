@@ -5,6 +5,7 @@ use necsim_core::cogs::{Habitat, RngCore};
 pub mod error;
 
 use error::InMemoryDispersalSamplerError;
+use necsim_core_bond::NonNegativeF64;
 use necsim_impls_no_std::cogs::dispersal_sampler::in_memory::{
     contract::explicit_in_memory_dispersal_check_contract,
     InMemoryDispersalSampler as InMemoryDispersalSamplerNoError,
@@ -33,7 +34,10 @@ pub trait InMemoryDispersalSampler<H: Habitat, G: RngCore>:
             explicit_in_memory_dispersal_check_contract(dispersal, habitat)
         ), "returns Err(InconsistentDispersalProbabilities) iff the dispersal probabilities are inconsistent"
     )]
-    fn new(dispersal: &Array2D<f64>, habitat: &H) -> Result<Self, InMemoryDispersalSamplerError>;
+    fn new(
+        dispersal: &Array2D<NonNegativeF64>,
+        habitat: &H,
+    ) -> Result<Self, InMemoryDispersalSamplerError>;
 }
 
 #[contract_trait]
@@ -54,7 +58,10 @@ impl<H: Habitat, G: RngCore, T: InMemoryDispersalSamplerNoError<H, G>>
     /// - habitat cells must disperse somewhere
     /// - non-habitat cells must not disperse
     /// - dispersal must only target habitat cells
-    fn new(dispersal: &Array2D<f64>, habitat: &H) -> Result<Self, InMemoryDispersalSamplerError> {
+    fn new(
+        dispersal: &Array2D<NonNegativeF64>,
+        habitat: &H,
+    ) -> Result<Self, InMemoryDispersalSamplerError> {
         let habitat_extent = habitat.get_extent();
 
         let habitat_area = (habitat_extent.width() as usize) * (habitat_extent.height() as usize);

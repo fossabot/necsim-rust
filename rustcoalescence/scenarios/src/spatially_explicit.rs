@@ -2,9 +2,8 @@ use std::{marker::PhantomData, num::NonZeroU32};
 
 use array2d::Array2D;
 use necsim_core::cogs::{DispersalSampler, Habitat, LineageStore, RngCore};
-use thiserror::Error;
 
-use necsim_core_bond::PositiveUnitF64;
+use necsim_core_bond::{NonNegativeF64, PositiveUnitF64};
 
 use necsim_impls_no_std::{
     cogs::{
@@ -27,7 +26,7 @@ use crate::{Scenario, ScenarioArguments};
 #[allow(clippy::module_name_repetitions)]
 pub struct SpatiallyExplicitScenario<G: RngCore> {
     habitat: InMemoryHabitat,
-    dispersal_map: Array2D<f64>,
+    dispersal_map: Array2D<NonNegativeF64>,
     turnover_rate: UniformTurnoverRate,
     speciation_probability: UniformSpeciationProbability,
     _marker: PhantomData<G>,
@@ -37,13 +36,8 @@ pub struct SpatiallyExplicitScenario<G: RngCore> {
 #[allow(clippy::module_name_repetitions)]
 pub struct InMemoryArguments {
     pub habitat_map: Array2D<u32>,
-    pub dispersal_map: Array2D<f64>,
+    pub dispersal_map: Array2D<NonNegativeF64>,
 }
-
-#[derive(Debug, Error)]
-#[error("{0} is negative.")]
-#[allow(clippy::module_name_repetitions)]
-pub struct NonNegativeF64Error(f64);
 
 impl<G: RngCore> ScenarioArguments for SpatiallyExplicitScenario<G> {
     type Arguments = InMemoryArguments;

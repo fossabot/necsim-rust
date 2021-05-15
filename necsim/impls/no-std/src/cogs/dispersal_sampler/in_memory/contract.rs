@@ -1,10 +1,11 @@
 use array2d::Array2D;
 
 use necsim_core::{cogs::Habitat, landscape::Location};
+use necsim_core_bond::NonNegativeF64;
 
 #[allow(clippy::module_name_repetitions)]
 pub fn explicit_in_memory_dispersal_check_contract<H: Habitat>(
-    dispersal: &Array2D<f64>,
+    dispersal: &Array2D<NonNegativeF64>,
     habitat: &H,
 ) -> bool {
     let habitat_width = habitat.get_extent().width();
@@ -33,9 +34,6 @@ pub fn explicit_in_memory_dispersal_check_contract<H: Habitat>(
                     }
 
                     any_dispersal = true;
-                } else if dispersal[(row_index, col_index)] < 0.0_f64 {
-                    // Dispersal probabilities must be non-negative
-                    return false;
                 }
             }
 

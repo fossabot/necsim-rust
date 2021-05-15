@@ -9,7 +9,7 @@ use structopt::StructOpt;
 
 mod parse;
 
-use necsim_core_bond::{ClosedUnitF64, Partition, PositiveUnitF64};
+use necsim_core_bond::{ClosedUnitF64, NonNegativeF64, Partition, PositiveUnitF64};
 
 use necsim_impls_std::event_log::{recorder::EventLogRecorder, replay::EventLogReplay};
 
@@ -202,7 +202,8 @@ impl From<ScenarioRaw> for Scenario {
 
                     let total_area = (args.area.0 as usize) * (args.area.1 as usize);
 
-                    let dispersal_map = Array2D::filled_with(1.0_f64, total_area, total_area);
+                    let dispersal_map =
+                        Array2D::filled_with(NonNegativeF64::one(), total_area, total_area);
 
                     Scenario::SpatiallyExplicit(InMemoryArguments {
                         habitat_map,
@@ -229,11 +230,18 @@ enum ScenarioRaw {
     AlmostInfinite(AlmostInfiniteArguments),
 }
 
+#[derive(Debug)]
+pub enum InMemoryTurnover {
+    Uniform(PositiveUnitF64),
+    Map(Array2D<NonNegativeF64>),
+}
+
 #[derive(Debug, Deserialize)]
 #[serde(try_from = "InMemoryArgsRaw")]
 struct InMemoryArgs {
     habitat_map: Array2D<u32>,
-    dispersal_map: Array2D<f64>,
+    dispersal_map: Array2D<NonNegativeF64>,
+    turnover_map: InMemoryTurnover,
 }
 
 impl TryFrom<InMemoryArgsRaw> for InMemoryArgs {
@@ -256,14 +264,40 @@ impl TryFrom<InMemoryArgsRaw> for InMemoryArgs {
             dispersal_map.num_rows()
         );
 
+        let turnover_map = match raw.turnover_map {
+            InMemoryTurnoverRaw::Uniform(turnover_rate) => InMemoryTurnover::Uniform(turnover_rate),
+            InMemoryTurnoverRaw::Map(turnover_map_path) => {
+                info!(
+                    "Starting to load the turnover map {:?} ...",
+                    &turnover_map_path
+                );
+
+                let turnover_map =
+                    crate::maps::load_turnover_map(&turnover_map_path, raw.loading_mode)?;
+
+                info!(
+                    "Successfully loaded the turnover map {:?} with dimensions {}x{} [cols x \
+                     rows].",
+                    &turnover_map_path,
+                    turnover_map.num_columns(),
+                    turnover_map.num_rows()
+                );
+
+                InMemoryTurnover::Map(turnover_map)
+            },
+        };
+
         info!(
             "Starting to load the habitat map {:?} ...",
             &raw.habitat_map
         );
 
-        let habitat_map =
-            crate::maps::load_habitat_map(&raw.habitat_map, &mut dispersal_map, raw.loading_mode)
-                .map_err(|err| format!("{:?}", err))?;
+        let habitat_map = crate::maps::load_habitat_map(
+            &raw.habitat_map,
+            &turnover_map,
+            &mut dispersal_map,
+            raw.loading_mode,
+        ).map_err(|err| format!("{:?}", err))?;
 
         info!(
             "Successfully loaded the habitat map {:?} with dimensions {}x{} [cols x rows].",
@@ -275,6 +309,7 @@ impl TryFrom<InMemoryArgsRaw> for InMemoryArgs {
         Ok(InMemoryArgs {
             habitat_map,
             dispersal_map,
+            turnover_map,
         })
     }
 }
@@ -293,6 +328,18 @@ impl Default for MapLoadingMode {
 }
 
 #[derive(Debug, Deserialize)]
+enum InMemoryTurnoverRaw {
+    Uniform(PositiveUnitF64),
+    Map(PathBuf),
+}
+
+impl Default for InMemoryTurnoverRaw {
+    fn default() -> Self {
+        Self::Uniform(PositiveUnitF64::new(0.5_f64).unwrap())
+    }
+}
+
+#[derive(Debug, Deserialize)]
 #[allow(clippy::module_name_repetitions)]
 #[serde(rename = "SpatiallyExplicit")]
 #[serde(deny_unknown_fields)]
@@ -302,6 +349,10 @@ struct InMemoryArgsRaw {
 
     #[serde(alias = "dispersal")]
     dispersal_map: PathBuf,
+
+    #[serde(default)]
+    #[serde(alias = "turnover")]
+    turnover_map: InMemoryTurnoverRaw,
 
     #[serde(default)]
     #[serde(alias = "mode")]

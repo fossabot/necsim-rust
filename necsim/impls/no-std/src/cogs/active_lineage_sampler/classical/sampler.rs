@@ -275,7 +275,7 @@ impl<
     fn peek_time_of_next_event(
         &mut self,
         _habitat: &H,
-        _turnover_rate: &UniformTurnoverRate,
+        turnover_rate: &UniformTurnoverRate,
         rng: &mut G,
     ) -> Result<PositiveF64, EmptyActiveLineageSamplerError> {
         use necsim_core::cogs::RngSampler;
@@ -284,7 +284,7 @@ impl<
             if let Some(number_active_lineages) =
                 NonZeroU64::new(self.number_active_lineages() as u64)
             {
-                let lambda = UniformTurnoverRate::get_uniform_turnover_rate()
+                let lambda = turnover_rate.get_uniform_turnover_rate()
                     * PositiveF64::from(number_active_lineages);
 
                 let event_time = self.last_event_time + rng.sample_exponential(lambda);
