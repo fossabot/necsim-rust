@@ -19,7 +19,7 @@ use necsim_impls_no_std::{
     decomposition::modulo::ModuloDecomposition,
 };
 
-use crate::{Scenario, ScenarioArguments};
+use crate::{Scenario, ScenarioParameters};
 
 #[allow(clippy::module_name_repetitions)]
 pub struct SpatiallyImplicitScenario<G: RngCore> {
@@ -42,15 +42,15 @@ pub struct SpatiallyImplicitArguments {
     pub migration_probability_per_generation: PositiveUnitF64,
 }
 
-impl<G: RngCore> ScenarioArguments for SpatiallyImplicitScenario<G> {
+impl<G: RngCore> ScenarioParameters for SpatiallyImplicitScenario<G> {
     type Arguments = SpatiallyImplicitArguments;
+    type Error = !;
 }
 
 impl<G: RngCore> Scenario<G> for SpatiallyImplicitScenario<G> {
     type Decomposition = ModuloDecomposition;
     type DispersalSampler<D: DispersalSampler<Self::Habitat, G>> =
         SpatiallyImplicitDispersalSampler<G>;
-    type Error = !;
     type Habitat = SpatiallyImplicitHabitat;
     type LineageReference = InMemoryLineageReference;
     type LineageStore<L: LineageStore<Self::Habitat, Self::LineageReference>> = L;

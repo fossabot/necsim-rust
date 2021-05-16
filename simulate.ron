@@ -1,19 +1,20 @@
 (
-    speciation: 0.001,
-    sample: 1.0,
+    speciation: 0.1,
+    sample: 0.00000025,
     seed: 42,
-
-    scenario: NonSpatial(
-        area: (100, 100),
-        deme: 100,
-    ),
     
-    algorithm: Independent(),
+    algorithm: SkippingGillespie(),
+
+    scenario: SpatiallyExplicit(
+        habitat: "maps/madingley/fg0size12/habitat.tif",
+        dispersal: "maps/madingley/fg0size12/dispersal.tif",
+        turnover: Map("maps/madingley/fg0size12/turnover.tif"),
+    ),
     
     reporters: [
         Plugin(
             library: "target/release/deps/libnecsim_plugins_common.so",
-            reporters: [Execution(), Progress(), Biodiversity()],
+            reporters: [Biodiversity(), Execution(), Progress()],
         ),
     ],
 )

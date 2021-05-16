@@ -32,7 +32,7 @@ use necsim_impls_std::cogs::{
 };
 use necsim_partitioning_core::LocalPartition;
 
-use rustcoalescence_algorithms::{Algorithm, AlgorithmArguments};
+use rustcoalescence_algorithms::{Algorithm, AlgorithmParamters};
 use rustcoalescence_scenarios::Scenario;
 
 use crate::arguments::{
@@ -42,8 +42,9 @@ use crate::arguments::{
 #[allow(clippy::module_name_repetitions, clippy::empty_enum)]
 pub struct SkippingGillespieAlgorithm {}
 
-impl AlgorithmArguments for SkippingGillespieAlgorithm {
+impl AlgorithmParamters for SkippingGillespieAlgorithm {
     type Arguments = MonolithicArguments;
+    type Error = !;
 }
 
 #[allow(clippy::type_complexity)]
@@ -55,7 +56,6 @@ where
     O::DispersalSampler<InMemorySeparableAliasDispersalSampler<O::Habitat, Pcg>>:
         SeparableDispersalSampler<O::Habitat, Pcg>,
 {
-    type Error = !;
     type LineageReference = InMemoryLineageReference;
     type LineageStore = O::LineageStore<GillespieLineageStore<O::Habitat>>;
     type Rng = Pcg;

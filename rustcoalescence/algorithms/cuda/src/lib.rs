@@ -31,7 +31,7 @@ use necsim_impls_no_std::cogs::{
 };
 use necsim_partitioning_core::LocalPartition;
 
-use rustcoalescence_algorithms::{Algorithm, AlgorithmArguments};
+use rustcoalescence_algorithms::{Algorithm, AlgorithmParamters};
 use rustcoalescence_scenarios::Scenario;
 
 use rust_cuda::{
@@ -59,8 +59,9 @@ use cuda::with_initialised_cuda;
 #[allow(clippy::module_name_repetitions, clippy::empty_enum)]
 pub enum CudaAlgorithm {}
 
-impl AlgorithmArguments for CudaAlgorithm {
+impl AlgorithmParamters for CudaAlgorithm {
     type Arguments = CudaArguments;
+    type Error = anyhow::Error;
 }
 
 #[allow(clippy::type_complexity)]
@@ -72,7 +73,6 @@ where
     O::TurnoverRate: RustToCuda,
     O::SpeciationProbability: RustToCuda,
 {
-    type Error = anyhow::Error;
     type LineageReference = GlobalLineageReference;
     type LineageStore = IndependentLineageStore<O::Habitat>;
     type Rng = CudaRng<WyHash>;

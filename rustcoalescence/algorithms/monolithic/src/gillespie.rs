@@ -29,7 +29,7 @@ use necsim_impls_std::cogs::{
 };
 use necsim_partitioning_core::LocalPartition;
 
-use rustcoalescence_algorithms::{Algorithm, AlgorithmArguments};
+use rustcoalescence_algorithms::{Algorithm, AlgorithmParamters};
 use rustcoalescence_scenarios::Scenario;
 
 use crate::arguments::{
@@ -39,8 +39,9 @@ use crate::arguments::{
 #[allow(clippy::module_name_repetitions, clippy::empty_enum)]
 pub struct GillespieAlgorithm {}
 
-impl AlgorithmArguments for GillespieAlgorithm {
+impl AlgorithmParamters for GillespieAlgorithm {
     type Arguments = MonolithicArguments;
+    type Error = !;
 }
 
 #[allow(clippy::type_complexity)]
@@ -50,7 +51,6 @@ where
     O::LineageStore<GillespieLineageStore<O::Habitat>>:
         GloballyCoherentLineageStore<O::Habitat, InMemoryLineageReference>,
 {
-    type Error = !;
     type LineageReference = InMemoryLineageReference;
     type LineageStore = O::LineageStore<GillespieLineageStore<O::Habitat>>;
     type Rng = Pcg;

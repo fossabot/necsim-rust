@@ -9,13 +9,14 @@ use structopt::StructOpt;
 
 mod parse;
 
-use necsim_core_bond::{ClosedUnitF64, NonNegativeF64, Partition, PositiveUnitF64};
+use necsim_core_bond::{ClosedUnitF64, NonNegativeF64, Partition, PositiveF64, PositiveUnitF64};
 
 use necsim_impls_std::event_log::{recorder::EventLogRecorder, replay::EventLogReplay};
 
 use rustcoalescence_scenarios::{
     almost_infinite::AlmostInfiniteArguments, non_spatial::NonSpatialArguments,
-    spatially_explicit::InMemoryArguments, spatially_implicit::SpatiallyImplicitArguments,
+    spatially_explicit::InMemoryArguments, spatially_explicit_turnover::InMemoryTurnoverArguments,
+    spatially_implicit::SpatiallyImplicitArguments,
 };
 
 #[cfg(any(
@@ -23,7 +24,7 @@ use rustcoalescence_scenarios::{
     feature = "rustcoalescence-algorithms-independent",
     feature = "rustcoalescence-algorithms-cuda"
 ))]
-use rustcoalescence_algorithms::AlgorithmArguments;
+use rustcoalescence_algorithms::AlgorithmParamters;
 
 use necsim_plugins_core::import::{AnyReporterPluginVec, ReporterPluginLibrary};
 
@@ -137,24 +138,24 @@ pub enum Algorithm {
     #[cfg(feature = "rustcoalescence-algorithms-monolithic")]
     Classical(
         #[serde(deserialize_state)]
-        <rustcoalescence_algorithms_monolithic::classical::ClassicalAlgorithm as rustcoalescence_algorithms::AlgorithmArguments>::Arguments,
+        <rustcoalescence_algorithms_monolithic::classical::ClassicalAlgorithm as rustcoalescence_algorithms::AlgorithmParamters>::Arguments,
     ),
     #[cfg(feature = "rustcoalescence-algorithms-monolithic")]
     Gillespie(
         #[serde(deserialize_state)]
-        <rustcoalescence_algorithms_monolithic::gillespie::GillespieAlgorithm as AlgorithmArguments>::Arguments,
+        <rustcoalescence_algorithms_monolithic::gillespie::GillespieAlgorithm as AlgorithmParamters>::Arguments,
     ),
     #[cfg(feature = "rustcoalescence-algorithms-monolithic")]
     SkippingGillespie(
         #[serde(deserialize_state)]
-        <rustcoalescence_algorithms_monolithic::skipping_gillespie::SkippingGillespieAlgorithm as AlgorithmArguments>::Arguments,
+        <rustcoalescence_algorithms_monolithic::skipping_gillespie::SkippingGillespieAlgorithm as AlgorithmParamters>::Arguments,
     ),
     #[cfg(feature = "rustcoalescence-algorithms-cuda")]
     #[serde(alias = "CUDA")]
-    Cuda(#[serde(deserialize_state)] <rustcoalescence_algorithms_cuda::CudaAlgorithm as AlgorithmArguments>::Arguments),
+    Cuda(#[serde(deserialize_state)] <rustcoalescence_algorithms_cuda::CudaAlgorithm as AlgorithmParamters>::Arguments),
     #[cfg(feature = "rustcoalescence-algorithms-independent")]
     Independent(
-        #[serde(deserialize_state)] <rustcoalescence_algorithms_independent::IndependentAlgorithm as AlgorithmArguments>::Arguments,
+        #[serde(deserialize_state)] <rustcoalescence_algorithms_independent::IndependentAlgorithm as AlgorithmParamters>::Arguments,
     ),
 }
 
@@ -181,6 +182,7 @@ impl fmt::Display for Algorithm {
 #[serde(from = "ScenarioRaw")]
 pub enum Scenario {
     SpatiallyExplicit(InMemoryArguments),
+    SpatiallyExplicitTurnover(InMemoryTurnoverArguments),
     NonSpatial(NonSpatialArguments),
     SpatiallyImplicit(SpatiallyImplicitArguments),
     AlmostInfinite(AlmostInfiniteArguments),
@@ -189,11 +191,21 @@ pub enum Scenario {
 impl From<ScenarioRaw> for Scenario {
     fn from(raw: ScenarioRaw) -> Self {
         match raw {
-            ScenarioRaw::SpatiallyExplicit(args) => {
-                Scenario::SpatiallyExplicit(InMemoryArguments {
-                    habitat_map: args.habitat_map,
-                    dispersal_map: args.dispersal_map,
-                })
+            ScenarioRaw::SpatiallyExplicit(args) => match args.turnover_map {
+                InMemoryTurnover::Uniform(turnover_rate) => {
+                    Scenario::SpatiallyExplicit(InMemoryArguments {
+                        habitat_map: args.habitat_map,
+                        dispersal_map: args.dispersal_map,
+                        turnover_rate,
+                    })
+                },
+                InMemoryTurnover::Map(turnover_map) => {
+                    Scenario::SpatiallyExplicitTurnover(InMemoryTurnoverArguments {
+                        habitat_map: args.habitat_map,
+                        dispersal_map: args.dispersal_map,
+                        turnover_map,
+                    })
+                },
             },
             ScenarioRaw::NonSpatial(args) => {
                 if args.spatial {
@@ -208,6 +220,7 @@ impl From<ScenarioRaw> for Scenario {
                     Scenario::SpatiallyExplicit(InMemoryArguments {
                         habitat_map,
                         dispersal_map,
+                        turnover_rate: PositiveF64::new(0.5).unwrap(),
                     })
                 } else {
                     Scenario::NonSpatial(NonSpatialArguments {
@@ -232,7 +245,7 @@ enum ScenarioRaw {
 
 #[derive(Debug)]
 pub enum InMemoryTurnover {
-    Uniform(PositiveUnitF64),
+    Uniform(PositiveF64),
     Map(Array2D<NonNegativeF64>),
 }
 
@@ -329,13 +342,13 @@ impl Default for MapLoadingMode {
 
 #[derive(Debug, Deserialize)]
 enum InMemoryTurnoverRaw {
-    Uniform(PositiveUnitF64),
+    Uniform(PositiveF64),
     Map(PathBuf),
 }
 
 impl Default for InMemoryTurnoverRaw {
     fn default() -> Self {
-        Self::Uniform(PositiveUnitF64::new(0.5_f64).unwrap())
+        Self::Uniform(PositiveF64::new(0.5_f64).unwrap())
     }
 }
 

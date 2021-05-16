@@ -11,13 +11,12 @@ use necsim_partitioning_core::LocalPartition;
 
 use rustcoalescence_scenarios::Scenario;
 
-pub trait AlgorithmArguments {
+pub trait AlgorithmParamters {
     type Arguments;
+    type Error;
 }
 
-pub trait Algorithm<O: Scenario<Self::Rng>>: Sized + AlgorithmArguments {
-    type Error;
-
+pub trait Algorithm<O: Scenario<Self::Rng>>: Sized + AlgorithmParamters {
     type Rng: RngCore;
     type LineageReference: LineageReference<O::Habitat>;
     type LineageStore: LineageStore<O::Habitat, Self::LineageReference>;

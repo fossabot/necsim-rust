@@ -316,20 +316,6 @@
         )
     ),
 
-    /* selection of the event persistence strategy
-     * optional, default = None */
-    log: (
-        /* file path to a directory in which a log of all events will be saved
-         * implies that events will not be reported live, but can be replayed later
-         * required when the simulation is internally parellelised */
-      | Some(PathBuf)
-        /* equivalent to Some(PathBuf) */
-      | (PathBuf)
-        /* events are reported live but not persisted
-         * invalid when the simulation is internally parallelised */
-      | None
-    ),
-
     /* selection of the scenario which will be simulated */
     scenario: (
         /* spatially explicit scenario using habitat and dispersal maps */
@@ -393,6 +379,20 @@
             /* sigma for the Gaussian dispersal kernel N(0, sigma^2) */
             sigma: (0.0 <= f64),
         )
+    ),
+
+    /* selection of the event persistence strategy
+     * optional, default = None */
+    log: (
+        /* file path to a directory in which a log of all events will be saved
+         * implies that events will not be reported live, but can be replayed later
+         * required when the simulation is internally parellelised */
+      | Some(PathBuf)
+        /* equivalent to Some(PathBuf) */
+      | (PathBuf)
+        /* events are reported live but not persisted
+         * invalid when the simulation is internally parallelised */
+      | None
     ),
 
     /* selection of the reporters which will analyse the simulation

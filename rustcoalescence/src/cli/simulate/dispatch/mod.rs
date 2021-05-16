@@ -19,11 +19,15 @@ use necsim_partitioning_core::LocalPartition;
 
 use rustcoalescence_scenarios::{
     almost_infinite::AlmostInfiniteScenario, non_spatial::NonSpatialScenario,
-    spatially_explicit::SpatiallyExplicitScenario, spatially_implicit::SpatiallyImplicitScenario,
-    Scenario,
+    spatially_explicit::SpatiallyExplicitScenario,
+    spatially_explicit_turnover::SpatiallyExplicitTurnoverScenario,
+    spatially_implicit::SpatiallyImplicitScenario, Scenario,
 };
 
 use crate::args::{Algorithm as AlgorithmArgs, CommonArgs, Scenario as ScenarioArgs};
+
+mod classical;
+use classical::ClassicalAlgorithmTurnoverDispatch;
 
 #[allow(clippy::too_many_lines, clippy::boxed_local)]
 pub fn simulate_with_logger<R: Reporter, P: LocalPartition<R>>(
@@ -47,14 +51,13 @@ pub fn simulate_with_logger<R: Reporter, P: LocalPartition<R>>(
     {
         #[cfg(feature = "rustcoalescence-algorithms-monolithic")]
         AlgorithmArgs::Classical(algorithm_args) => {
-            ClassicalAlgorithm::initialise_and_simulate(
+            ClassicalAlgorithm::initialise_and_simulate_dispatch(
                 algorithm_args,
                 common_args.seed,
                 scenario,
                 pre_sampler,
-                &mut *local_partition,
-            )
-            .into_ok()
+                &mut *local_partition
+            )?
         },
         #[cfg(feature = "rustcoalescence-algorithms-monolithic")]
         AlgorithmArgs::Gillespie(algorithm_args) => {
@@ -102,6 +105,12 @@ pub fn simulate_with_logger<R: Reporter, P: LocalPartition<R>>(
         <=>
         ScenarioArgs::SpatiallyExplicit(scenario_args) => {
             SpatiallyExplicitScenario::initialise(
+                scenario_args,
+                common_args.speciation_probability_per_generation,
+            )?
+        },
+        ScenarioArgs::SpatiallyExplicitTurnover(scenario_args) => {
+            SpatiallyExplicitTurnoverScenario::initialise(
                 scenario_args,
                 common_args.speciation_probability_per_generation,
             )?

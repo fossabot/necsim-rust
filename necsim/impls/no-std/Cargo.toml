@@ -27,6 +27,7 @@ xxhash-rust = { version = "0.8.2", features = ["xxh64"] }
 slab = { version = "0.4.3", default-features = false, features = [] }
 serde = { version = "1.0", default-features = false, features = ["derive"] }
 log = "0.4.14"
+displaydoc = { version = "0.2.1", default-features = false, features = [] }
 
 [target.'cfg(target_os = "cuda")'.dependencies]
 rust-cuda = { path = "../../../rust-cuda", features = ["derive"], optional = true }

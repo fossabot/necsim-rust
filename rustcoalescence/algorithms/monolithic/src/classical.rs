@@ -27,7 +27,7 @@ use necsim_impls_no_std::{
 use necsim_impls_std::cogs::rng::pcg::Pcg;
 use necsim_partitioning_core::LocalPartition;
 
-use rustcoalescence_algorithms::{Algorithm, AlgorithmArguments};
+use rustcoalescence_algorithms::{Algorithm, AlgorithmParamters};
 use rustcoalescence_scenarios::Scenario;
 
 use crate::arguments::{
@@ -37,8 +37,9 @@ use crate::arguments::{
 #[allow(clippy::module_name_repetitions, clippy::empty_enum)]
 pub enum ClassicalAlgorithm {}
 
-impl AlgorithmArguments for ClassicalAlgorithm {
+impl AlgorithmParamters for ClassicalAlgorithm {
     type Arguments = MonolithicArguments;
+    type Error = !;
 }
 
 #[allow(clippy::type_complexity)]
@@ -53,7 +54,6 @@ where
     O::LineageStore<ClassicalLineageStore<O::Habitat>>:
         LocallyCoherentLineageStore<O::Habitat, InMemoryLineageReference>,
 {
-    type Error = !;
     type LineageReference = InMemoryLineageReference;
     type LineageStore = O::LineageStore<ClassicalLineageStore<O::Habitat>>;
     type Rng = Pcg;

@@ -25,15 +25,15 @@ use necsim_impls_no_std::{
 pub mod almost_infinite;
 pub mod non_spatial;
 pub mod spatially_explicit;
+pub mod spatially_explicit_turnover;
 pub mod spatially_implicit;
 
-pub trait ScenarioArguments {
+pub trait ScenarioParameters {
     type Arguments;
+    type Error;
 }
 
-pub trait Scenario<G: RngCore>: Sized + ScenarioArguments {
-    type Error;
-
+pub trait Scenario<G: RngCore>: Sized + ScenarioParameters {
     type Habitat: Habitat;
     type OriginSampler<'h, I: Iterator<Item = u64>>: OriginSampler<'h, Habitat = Self::Habitat>;
     type Decomposition: Decomposition<Self::Habitat>;

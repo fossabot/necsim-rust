@@ -49,19 +49,19 @@ use necsim_partitioning_core::LocalPartition;
 
 mod arguments;
 
-use rustcoalescence_algorithms::{Algorithm, AlgorithmArguments};
+use rustcoalescence_algorithms::{Algorithm, AlgorithmParamters};
 use rustcoalescence_scenarios::Scenario;
 
 #[allow(clippy::module_name_repetitions, clippy::empty_enum)]
 pub enum IndependentAlgorithm {}
 
-impl AlgorithmArguments for IndependentAlgorithm {
+impl AlgorithmParamters for IndependentAlgorithm {
     type Arguments = IndependentArguments;
+    type Error = !;
 }
 
 #[allow(clippy::type_complexity)]
 impl<O: Scenario<WyHash>> Algorithm<O> for IndependentAlgorithm {
-    type Error = !;
     type LineageReference = GlobalLineageReference;
     type LineageStore = IndependentLineageStore<O::Habitat>;
     type Rng = WyHash;

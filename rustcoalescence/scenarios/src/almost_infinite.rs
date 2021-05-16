@@ -20,7 +20,7 @@ use necsim_impls_no_std::{
     decomposition::radial::RadialDecomposition,
 };
 
-use crate::{Scenario, ScenarioArguments};
+use crate::{Scenario, ScenarioParameters};
 
 #[allow(clippy::module_name_repetitions)]
 pub struct AlmostInfiniteScenario<G: RngCore> {
@@ -40,15 +40,15 @@ pub struct AlmostInfiniteArguments {
     pub sigma: NonNegativeF64,
 }
 
-impl<G: RngCore> ScenarioArguments for AlmostInfiniteScenario<G> {
+impl<G: RngCore> ScenarioParameters for AlmostInfiniteScenario<G> {
     type Arguments = AlmostInfiniteArguments;
+    type Error = !;
 }
 
 impl<G: RngCore> Scenario<G> for AlmostInfiniteScenario<G> {
     type Decomposition = RadialDecomposition;
     type DispersalSampler<D: DispersalSampler<Self::Habitat, G>> =
         AlmostInfiniteNormalDispersalSampler<G>;
-    type Error = !;
     type Habitat = AlmostInfiniteHabitat;
     type LineageReference = InMemoryLineageReference;
     type LineageStore<L: LineageStore<Self::Habitat, Self::LineageReference>> =

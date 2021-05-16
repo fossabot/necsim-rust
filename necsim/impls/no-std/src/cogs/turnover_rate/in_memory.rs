@@ -48,13 +48,35 @@ impl TurnoverRate<InMemoryHabitat> for InMemoryTurnoverRate {
     }
 }
 
-impl InMemoryTurnoverRate {
-    #[must_use]
-    pub fn new(turnover_rate: Array2D<NonNegativeF64>) -> Self {
-        // TODO: Still needs verification against habitat
+#[allow(clippy::module_name_repetitions)]
+#[derive(displaydoc::Display, Debug)]
+pub enum InMemoryTurnoverRateError {
+    /// There is some location with zero turnover and non-zero habitat.
+    ZeroTurnoverHabitat,
+}
 
-        Self {
-            turnover_rate: turnover_rate.into_row_major().into_boxed_slice(),
+impl InMemoryTurnoverRate {
+    /// # Errors
+    ///
+    /// Returns `InMemoryTurnoverRateError::ZeroTurnoverHabitat` iff there is
+    ///  zero turnover at any location with non-zero habitat.
+    pub fn new(
+        turnover_rate: Array2D<NonNegativeF64>,
+        habitat: &InMemoryHabitat,
+    ) -> Result<Self, InMemoryTurnoverRateError> {
+        if habitat
+            .get_extent()
+            .iter()
+            .zip(turnover_rate.elements_row_major_iter())
+            .all(|(location, turnover)| {
+                (*turnover != 0.0_f64) || (habitat.get_habitat_at_location(&location) == 0)
+            })
+        {
+            Ok(Self {
+                turnover_rate: turnover_rate.into_row_major().into_boxed_slice(),
+            })
+        } else {
+            Err(InMemoryTurnoverRateError::ZeroTurnoverHabitat)
         }
     }
 }

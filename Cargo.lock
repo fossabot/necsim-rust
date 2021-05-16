@@ -285,6 +285,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ef8ae57c4978a2acd8b869ce6b9ca1dfe817bff704c220209fdef2c0b75a01b9"
 
 [[package]]
+name = "displaydoc"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3274a6bc8a6a4521291b53b9dcb8345e963fe931c3fc462a7d3ead71d7ccd30d"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "env_logger"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -616,6 +627,7 @@ dependencies = [
  "aes",
  "array2d",
  "contracts",
+ "displaydoc",
  "hashbrown",
  "libm",
  "log",
@@ -1161,6 +1173,7 @@ name = "rustcoalescence-scenarios"
 version = "0.1.0"
 dependencies = [
  "array2d",
+ "displaydoc",
  "log",
  "necsim-core",
  "necsim-core-bond",
