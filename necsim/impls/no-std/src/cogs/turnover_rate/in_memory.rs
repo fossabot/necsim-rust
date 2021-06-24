@@ -11,7 +11,7 @@ use necsim_core_bond::NonNegativeF64;
 use crate::cogs::habitat::in_memory::InMemoryHabitat;
 
 #[allow(clippy::module_name_repetitions)]
-#[cfg_attr(feature = "cuda", derive(RustToCuda))]
+#[cfg_attr(feature = "cuda", derive(rust_cuda::common::RustToCuda))]
 #[derive(Debug)]
 pub struct InMemoryTurnoverRate {
     #[cfg_attr(feature = "cuda", r2cEmbed)]

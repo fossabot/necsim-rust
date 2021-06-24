@@ -1,5 +1,5 @@
 (
-    speciation: 0.1,
+    speciation: 0.001,
     sample: 0.00000025,
     seed: 42,
     

@@ -286,7 +286,8 @@ impl TryFrom<InMemoryArgsRaw> for InMemoryArgs {
                 );
 
                 let turnover_map =
-                    crate::maps::load_turnover_map(&turnover_map_path, raw.loading_mode)?;
+                    crate::maps::load_turnover_map(&turnover_map_path, raw.loading_mode)
+                        .map_err(|err| format!("{:?}", err))?;
 
                 info!(
                     "Successfully loaded the turnover map {:?} with dimensions {}x{} [cols x \
@@ -310,7 +311,8 @@ impl TryFrom<InMemoryArgsRaw> for InMemoryArgs {
             &turnover_map,
             &mut dispersal_map,
             raw.loading_mode,
-        ).map_err(|err| format!("{:?}", err))?;
+        )
+        .map_err(|err| format!("{:?}", err))?;
 
         info!(
             "Successfully loaded the habitat map {:?} with dimensions {}x{} [cols x rows].",
