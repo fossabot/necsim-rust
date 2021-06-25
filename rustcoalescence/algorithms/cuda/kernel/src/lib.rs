@@ -92,10 +92,12 @@ pub unsafe extern "ptx-kernel" fn simulate(
         total_steps_sum.into(),
         max_steps,
         max_next_event_time,
-    )
+    );
 }
 
 #[inline]
+#[allow(clippy::type_complexity)]
+#[allow(clippy::too_many_arguments)]
 unsafe fn simulate_generic<
     H: Habitat + RustToCuda,
     G: PrimeableRng + RustToCuda,
@@ -180,7 +182,7 @@ unsafe fn simulate_generic<
                                         |next_event_time_buffer| {
                                             next_event_time_buffer.with_value_for_core(|_| {
                                                 simulation.peek_time_of_next_event()
-                                            })
+                                            });
                                         },
                                     );
 
@@ -191,16 +193,16 @@ unsafe fn simulate_generic<
                                     }
 
                                     simulation.event_sampler_mut().replace_min_speciation(None)
-                                })
+                                });
                             },
-                        )
+                        );
                     },
                 );
 
                 simulation
                     .active_lineage_sampler_mut()
                     .replace_active_lineage(None)
-            })
-        })
-    })
+            });
+        });
+    });
 }

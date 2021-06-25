@@ -1,7 +1,4 @@
-use std::{
-    ffi::{CStr, CString},
-    os::raw::c_char,
-};
+use std::ffi::CStr;
 
 use necsim_core::{
     cogs::{
@@ -16,8 +13,8 @@ use rust_cuda::rustacuda_core::DeviceCopy;
 
 use rust_cuda::common::RustToCuda;
 
-extern "C" {
-    fn get_ptx_cstr_for_specialisation(specialisation: *const c_char) -> *const c_char;
+extern "Rust" {
+    fn get_ptx_cstr_for_specialisation(specialisation: &str) -> &'static CStr;
 }
 
 pub fn get_ptx_cstr<
@@ -40,11 +37,9 @@ pub fn get_ptx_cstr<
         get_ptx_cstr::<H, G, R, S, X, D, C, T, N, E, I, A, ReportSpeciation, ReportDispersal>,
     );
 
-    let ptx_c_chars = unsafe { get_ptx_cstr_for_specialisation(type_name_cstring.as_ptr()) };
-
-    unsafe { CStr::from_ptr(ptx_c_chars.cast::<i8>()) }
+    unsafe { get_ptx_cstr_for_specialisation(type_name_cstring) }
 }
 
-fn type_name_of<T>(_: T) -> CString {
-    CString::new(std::any::type_name::<T>()).unwrap()
+fn type_name_of<T>(_: T) -> &'static str {
+    std::any::type_name::<T>()
 }

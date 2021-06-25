@@ -1041,31 +1041,8 @@ name = "rustcoalescence"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "array2d",
- "colored",
- "contracts",
- "log",
- "necsim-core",
- "necsim-core-bond",
- "necsim-impls-no-std",
- "necsim-impls-std",
- "necsim-partitioning-core",
- "necsim-partitioning-monolithic",
- "necsim-partitioning-mpi",
- "necsim-plugins-core",
- "ron",
- "rustcoalescence-algorithms",
- "rustcoalescence-algorithms-cuda",
- "rustcoalescence-algorithms-independent",
- "rustcoalescence-algorithms-monolithic",
- "rustcoalescence-scenarios",
- "serde",
- "serde_derive_state",
- "serde_path_to_error",
- "serde_state",
- "structopt",
- "thiserror",
- "tiff",
+ "rustcoalescence-cli",
+ "rustcoalescence-derive",
 ]
 
 [[package]]
@@ -1160,6 +1137,50 @@ dependencies = [
  "serde",
  "serde_derive_state",
  "serde_state",
+]
+
+[[package]]
+name = "rustcoalescence-cli"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "array2d",
+ "colored",
+ "contracts",
+ "log",
+ "necsim-core",
+ "necsim-core-bond",
+ "necsim-impls-no-std",
+ "necsim-impls-std",
+ "necsim-partitioning-core",
+ "necsim-partitioning-monolithic",
+ "necsim-partitioning-mpi",
+ "necsim-plugins-core",
+ "ron",
+ "rustcoalescence-algorithms",
+ "rustcoalescence-algorithms-cuda",
+ "rustcoalescence-algorithms-independent",
+ "rustcoalescence-algorithms-monolithic",
+ "rustcoalescence-scenarios",
+ "serde",
+ "serde_derive_state",
+ "serde_path_to_error",
+ "serde_state",
+ "structopt",
+ "thiserror",
+ "tiff",
+]
+
+[[package]]
+name = "rustcoalescence-derive"
+version = "0.1.0"
+dependencies = [
+ "proc-macro-error",
+ "proc-macro2",
+ "ptx-builder",
+ "quote",
+ "seahash",
+ "syn",
 ]
 
 [[package]]
