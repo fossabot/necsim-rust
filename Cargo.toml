@@ -42,6 +42,13 @@ members = [
     "third-party/RustaCUDA",
     "third-party/RustaCUDA/rustacuda_core",
     "third-party/RustaCUDA/rustacuda_derive",
+
+    "analysis/rng/randomness",
+    "analysis/rng/hash",
+    "analysis/rng/correlation",
+    "analysis/performance/exponential",
+    "analysis/performance/exponential/kernel",
+    "analysis/performance/reporting",
 ]
 
 default-members = [
