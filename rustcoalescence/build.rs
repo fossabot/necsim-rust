@@ -1,15 +1,17 @@
 use std::env;
 
 fn main() {
-    match env::var("CARGO_CFG_FEATURE") {
-        Ok(feature) if feature == "cargo-clippy" => println!("cargo:rustc-cfg=clippy"),
-        _ => (),
+    if let Ok(profile) = env::var("PROFILE") {
+        println!("cargo:rustc-cfg={}", profile);
+    }
+
+    if let Ok("cargo-clippy") = env::var("CARGO_CFG_FEATURE").as_ref().map(String::as_ref) {
+        println!("cargo:rustc-cfg=clippy");
     }
 
     // TODO: doesn't seem to work
-    match env::var("CARGO") {
-        Ok(cargo) if cargo.ends_with("rls") => println!("cargo:rustc-cfg=rls"),
-        _ => (),
+    if matches!(env::var("CARGO"), Ok(cargo) if cargo.ends_with("rls")) {
+        println!("cargo:rustc-cfg=rls")
     }
 
     // check: emits metadata, build: emits link (default)

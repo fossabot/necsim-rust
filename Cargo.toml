@@ -49,6 +49,7 @@ members = [
 
 default-members = [
     "rustcoalescence",
+    "rustcoalescence/cli",
     
     "necsim/plugins/common",
     "necsim/plugins/csv",

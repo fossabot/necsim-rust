@@ -32,7 +32,11 @@ fn extract_specialisation(input: &str) -> Option<&str> {
     None
 }
 
-fn build_kernel_with_specialisation(kernel_path: &Path, env_var: &str, specialisation: &str) -> Result<PathBuf> {
+fn build_kernel_with_specialisation(
+    kernel_path: &Path,
+    env_var: &str,
+    specialisation: &str,
+) -> Result<PathBuf> {
     env::set_var(env_var, specialisation);
 
     match Builder::new(kernel_path)?.build()? {
@@ -180,11 +184,13 @@ pub fn link_cuda_ptx_kernels(tokens: TokenStream) -> TokenStream {
         }
     }
 
+    let config_hint = config.hint;
+
     (quote!{
         #[no_mangle]
         extern "Rust" fn get_ptx_cstr_for_specialisation(specialisation: &str) -> &'static std::ffi::CStr {
             let ptx_str_with_nul = match specialisation {
-                #(#specialisations => #specialised_kernels),*,
+                #(concat!(#config_hint, #specialisations) => #specialised_kernels),*,
                 _ => unreachable!("Unknown CUDA kernel specialisation"),
             };
 
