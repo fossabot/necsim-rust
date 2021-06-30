@@ -45,6 +45,8 @@ members = [
     "third-party/RustaCUDA",
     "third-party/RustaCUDA/rustacuda_core",
     "third-party/RustaCUDA/rustacuda_derive",
+
+    "asm/asm",
 ]
 
 default-members = [
