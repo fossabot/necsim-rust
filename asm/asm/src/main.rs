@@ -35,7 +35,10 @@ extern "C" fn _RINvCs4VxPxZerBBV_7asm_asm3foolEB2__ho() {
 
 #[no_mangle]
 extern "C" fn _RINvCs4VxPxZerBBV_7asm_asm3fooNtNtCscRL1XZXviUR_5alloc6string6StringEB2__ho() {
-    println!("{}", demangle("_RINvCs4VxPxZerBBV_7asm_asm3fooNtNtCscRL1XZXviUR_5alloc6string6StringEB2_"))
+    println!(
+        "{}",
+        demangle("_RINvCs4VxPxZerBBV_7asm_asm3fooNtNtCscRL1XZXviUR_5alloc6string6StringEB2_")
+    )
 }
 
 #[no_mangle]
