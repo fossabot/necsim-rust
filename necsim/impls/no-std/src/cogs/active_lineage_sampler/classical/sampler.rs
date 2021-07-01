@@ -1,4 +1,4 @@
-use core::num::NonZeroU64;
+use core::num::{NonZeroU64, NonZeroUsize};
 
 use necsim_core::{
     cogs::{
@@ -107,8 +107,10 @@ impl<
             _ => return None, // In practice, this must match (None, None)
         };
 
-        let chosen_active_lineage_index =
-            rng.sample_index(self.active_lineage_references.len() + 1);
+        // Safety: +1 can never be zero
+        let chosen_active_lineage_index = rng.sample_index(unsafe {
+            NonZeroUsize::new_unchecked(self.active_lineage_references.len() + 1)
+        });
 
         let chosen_lineage_reference =
             if chosen_active_lineage_index == self.active_lineage_references.len() {
